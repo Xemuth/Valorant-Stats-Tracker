@@ -9,7 +9,8 @@ file
 	icon.rc,
 	VST.lay,
 	VST.iml,
-	app.tpp;
+	app.tpp,
+	KeyMap.h;
 
 mainconfig
 	"" = "GUI",

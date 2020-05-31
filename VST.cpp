@@ -11,6 +11,21 @@ BOOL GetMessageWithTimeout(MSG *msg, UINT to);
 
 void VST::Configure()
 {
+	config.RoundEndedChange.WhenAction = ([&]{
+		StopKeyListening =true; //Setting this to true ensure the key listening wont occure with KeyChange action
+		dword test =0;
+		KeyChange key(test);
+		key.Execute();
+		bool found = false;
+		if(AllKeys.Find(test) > -1){
+			Upp::Cout() << "Key selected for Round ended is : " <<  test << ", Is Name for Windows is : " <<  AllKeys.Get(test).KeyName <<  "\n";
+		}
+		StopKeyListening = false; //Reenabling hotkey
+	});
+	/*config.KillChange
+	config.HSChange
+	config.GSChange
+	config.GEChange*/
 	config.Execute();
 }
 
@@ -57,12 +72,20 @@ void VST::LoadCfg(){
 }
 
 void VST::SetupHotKey(){
-	UnregisterHotKey(0,END_ROUND);
-	UnregisterHotKey(0,KILL);
-	UnregisterHotKey(0,HEADSHOT_KILL);
+	ClearHotKey();
 	RegisterHotKey(0, END_ROUND, MOD_NOREPEAT, cfg.key_endRound);
 	RegisterHotKey(0, KILL, MOD_NOREPEAT, cfg.key_kill);
 	RegisterHotKey(0, HEADSHOT_KILL, MOD_NOREPEAT, cfg.headshot_kill);
+	RegisterHotKey(0, GAME_STARTED, MOD_NOREPEAT, cfg.game_started);
+	RegisterHotKey(0, GAME_ENDED, MOD_NOREPEAT, cfg.game_ended);
+}
+
+void VST::ClearHotKey(){
+	UnregisterHotKey(0,END_ROUND);
+	UnregisterHotKey(0,KILL);
+	UnregisterHotKey(0,HEADSHOT_KILL);
+	UnregisterHotKey(0,GAME_STARTED);
+	UnregisterHotKey(0,GAME_ENDED);
 }
 
 void VST::ProcessEvent(MSG& msg){
@@ -80,6 +103,12 @@ void VST::ProcessEvent(MSG& msg){
 					case HEADSHOT_KILL:
 						printf("headshot registered\n");
 						break;
+					case GAME_STARTED:
+						printf("game started\n");
+						break;
+					case GAME_ENDED:
+						printf("game ended\n");
+						break;
 				}
 		}
 	}
@@ -87,15 +116,46 @@ void VST::ProcessEvent(MSG& msg){
 
 void VST::RoutineKeyboardListener(){
 	MSG msg;
-	SetupHotKey();
 	printf("Keyboard listener thread have been started\n");
+	int cptCheckValorant = 999;
 	for(;;){
 		if(Thread::IsShutdownThreads())break;
-		if(reloadConfig){
-			SetupHotKey();
-			reloadConfig = false;
+		if(cptCheckValorant > 100){
+			//here we check for valorant and ensure valorant it is up
+			if(::FindWindow(NULL, "valorant")) {
+			//	ValorantIsStarted =true;
+			}else{
+			//	ValorantIsStarted = false;
+			}
+			cptCheckValorant=0;
+			Cout() << "Checking for Valorant : " << ValorantIsStarted <<"\n";
 		}
-		ProcessEvent(msg);
+		if(ValorantIsStarted){
+			if(!StopKeyListening){
+				if(reloadConfig || KeyHaveBeenStop){
+					printf("Loading HotKey\n");
+					SetupHotKey();
+					KeyHaveBeenStop = false;
+					reloadConfig = false;
+				}
+				ProcessEvent(msg);
+			}else{
+				if(!KeyHaveBeenStop){
+					printf("Removing Hotkey\n");
+					ClearHotKey();
+					KeyHaveBeenStop = true;
+				}
+				Sleep(100);
+			}
+		}else{
+			if(!KeyHaveBeenStop){
+				printf("Removing Hotkey\n");
+				ClearHotKey();
+				KeyHaveBeenStop = true;
+			}
+			Sleep(100);
+		}
+		cptCheckValorant++;
 	}
 	printf("Keyboard listener thread have ended\n");
 }
@@ -124,6 +184,9 @@ VST::VST()
 	CenterScreen();
 	Icon(VSTImg::icon());
 	hide  <<= THISBACK(HideWin);
+	ChangeValorant.WhenAction = ([&]{
+		ValorantIsStarted = !ValorantIsStarted;
+	});
 
 	trayicon.WhenBar = THISBACK(TrayMenu);
 	trayicon.WhenLeftDouble = THISBACK(dummyFunc);
