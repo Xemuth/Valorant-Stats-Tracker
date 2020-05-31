@@ -1,0 +1,27 @@
+LAYOUT(EyeCareLayout, 270, 216)
+	ITEM(MenuBar, menu, LeftPosZ(0, 256).TopPosZ(0, 24))
+	ITEM(ImageCtrl, image, LeftPosZ(10, 253).TopPosZ(32, 40))
+	ITEM(LabelBox, dv___2, LeftPosZ(8, 257).TopPosZ(24, 162))
+	ITEM(Label, text1, SetLabel(t_("text1")).SetFont(SerifZ(16).Bold()).LeftPosZ(16, 241).TopPosZ(75, 25))
+	ITEM(Label, text2, LeftPosZ(16, 241).TopPosZ(105, 35))
+	ITEM(Button, hide, SetLabel(t_("HIDE")).SetFont(SansSerifZ(25).Bold()).LeftPosZ(15, 242).TopPosZ(143, 35))
+	ITEM(StatusBar, status, LeftPosZ(0, 256).TopPosZ(192, 24))
+END_LAYOUT
+
+LAYOUT(ConfigurationLayout, 244, 120)
+	ITEM(LabelBox, dv___0, SetLabel(t_("Valorant Stats Tracker")).LeftPosZ(8, 228).TopPosZ(4, 108))
+	ITEM(Switch, directSend, SetLabel(t_("Direct\nTemporaire")).LeftPosZ(96, 128).TopPosZ(24, 16))
+	ITEM(Label, TimeSelectLabel, SetLabel(t_("10 minutes")).LeftPosZ(176, 56).TopPosZ(48, 19))
+	ITEM(Button, ok, SetLabel(t_("Save")).LeftPosZ(24, 72).TopPosZ(76, 24))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).LeftPosZ(132, 72).TopPosZ(76, 24))
+	ITEM(SliderCtrl, dv___5, LeftPosZ(72, 100).TopPosZ(48, 20))
+	ITEM(Label, dv___6, SetLabel(t_("Send method :")).LeftPosZ(16, 76).TopPosZ(24, 19))
+	ITEM(Label, TimeLabel, SetLabel(t_("Every :")).LeftPosZ(16, 48).TopPosZ(48, 19))
+END_LAYOUT
+
+LAYOUT(AboutDialogLayout, 304, 196)
+	ITEM(LabelBox, dv___0, SetLabel(t_("EyeCare")).LeftPosZ(4, 296).TopPosZ(0, 160))
+	ITEM(RichTextCtrl, text, LeftPosZ(12, 280).TopPosZ(20, 132))
+	ITEM(Button, ok, SetLabel(t_("OK")).LeftPosZ(228, 72).TopPosZ(168, 24))
+END_LAYOUT
+

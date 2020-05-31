@@ -1,0 +1,17 @@
+description "Tray application that reminds user to take care about his eyes\377";
+
+uses
+	CtrlLib;
+
+file
+	VST.h,
+	VST.cpp,
+	icon.rc,
+	VST.lay,
+	VST.iml,
+	app.tpp;
+
+mainconfig
+	"" = "GUI",
+	"" = "";
+

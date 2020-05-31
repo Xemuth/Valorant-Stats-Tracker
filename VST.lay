@@ -1,0 +1,34 @@
+LAYOUT(VSTLayout, 270, 216)
+	ITEM(MenuBar, menu, LeftPosZ(0, 272).TopPosZ(0, 24))
+	ITEM(StatusBar, statusBar, LeftPosZ(0, 272).TopPosZ(192, 24))
+	ITEM(ColumnList, DataSend2, LeftPosZ(8, 252).TopPosZ(84, 44))
+	ITEM(ColumnList, DataSend1, LeftPosZ(8, 252).TopPosZ(36, 40))
+	ITEM(Button, hide, SetLabel(t_("Hide")).LeftPosZ(68, 124).TopPosZ(148, 40))
+END_LAYOUT
+
+LAYOUT(ConfigurationLayout, 244, 224)
+	ITEM(LabelBox, dv___0, SetLabel(t_("Valorant Stats Tracker configuration")).LeftPosZ(8, 228).TopPosZ(4, 216))
+	ITEM(Label, HSLabel, SetLabel(t_("HS register :")).LeftPosZ(16, 80).TopPosZ(156, 19))
+	ITEM(Switch, directSend, SetLabel(t_("Direct\nTemporaire")).LeftPosZ(96, 128).TopPosZ(24, 16))
+	ITEM(Label, TimeSelectLabel, SetLabel(t_("10 minutes")).HSizePosZ(168, 12).TopPosZ(48, 19))
+	ITEM(Button, HSChange, SetLabel(t_("change key")).SetFont(Monospace().Italic()).LeftPosZ(152, 80).TopPosZ(156, 20))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).LeftPosZ(124, 72).TopPosZ(188, 24))
+	ITEM(SliderCtrl, tempoSlider, LeftPosZ(56, 108).TopPosZ(48, 20))
+	ITEM(Label, SendMLabel, SetLabel(t_("Send method :")).LeftPosZ(16, 76).TopPosZ(24, 19))
+	ITEM(Label, hotkeyLabel, SetLabel(t_("HotKey :")).SetFont(StdFont().Bold()).LeftPosZ(16, 72).TopPosZ(76, 19))
+	ITEM(Label, HSinput, SetLabel(t_("PG_UP")).HSizePosZ(100, 96).TopPosZ(156, 19))
+	ITEM(Label, TimeLabel, SetLabel(t_("Every :")).LeftPosZ(16, 36).TopPosZ(48, 19))
+	ITEM(Label, RoundEndedLabel, SetLabel(t_("Round Ended :")).LeftPosZ(16, 80).TopPosZ(100, 19))
+	ITEM(Button, ok, SetLabel(t_("Save")).LeftPosZ(36, 72).TopPosZ(188, 24))
+	ITEM(Label, RoundEndedInput, SetLabel(t_("INSERT")).LeftPosZ(100, 48).TopPosZ(100, 19))
+	ITEM(Button, RoundEndedChange, SetLabel(t_("change key")).SetFont(Monospace().Italic()).LeftPosZ(152, 80).TopPosZ(100, 20))
+	ITEM(Label, KillLabel, SetLabel(t_("Kill register :")).LeftPosZ(16, 80).TopPosZ(128, 19))
+	ITEM(Label, KillInput, SetLabel(t_("HOME")).LeftPosZ(100, 48).TopPosZ(128, 19))
+	ITEM(Button, KillChange, SetLabel(t_("change key")).SetFont(Monospace().Italic()).LeftPosZ(152, 80).TopPosZ(128, 20))
+END_LAYOUT
+
+LAYOUT(AboutDialogLayout, 304, 196)
+	ITEM(RichTextCtrl, text, LeftPosZ(4, 292).TopPosZ(4, 156))
+	ITEM(Button, ok, SetLabel(t_("OK")).LeftPosZ(228, 72).TopPosZ(168, 24))
+END_LAYOUT
+
