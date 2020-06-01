@@ -9,7 +9,7 @@
 
 void VST::Configure()
 {
-	ClearHookKey(); //Setting this to true ensure the key listening wont occure with KeyChange action
+	StopKeyHook = true;
 	VSTOption config(cfg);
 	
 	config.RoundEndedChange.WhenAction = ([&]{
@@ -39,7 +39,7 @@ void VST::Configure()
 		if(!StoreToFile(cfg, cfgfile))
 			Exclamation("Error saving configuration file!");
 	}
-	SetupHookKey(); //Reenabling hotkey
+	StopKeyHook = false;
 }
 
 void VST::About()
@@ -201,17 +201,13 @@ VST::VST()
 GUI_APP_MAIN
 {
 #ifdef PLATFORM_WIN32
-	static const char unique_name[] = "VST";
-	if(::FindWindow(NULL, unique_name)) {
-		Exclamation(t_("VST is already running."));
-		return;
-	}
+	static const char unique_name[] = "Valorant Stats Tracker";
+	if(::FindWindow(NULL, unique_name)) {Exclamation(t_("VST is already running."));return;	}
 	TopWindow singlechk;
 	singlechk.SetRect(-1, -1, 1, 1);
 	singlechk.Hide();
 	singlechk.Title(unique_name);
 	singlechk.Open();
 #endif
-
 	VST().Run();
 }

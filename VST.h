@@ -9,7 +9,7 @@ using namespace Upp;
 
 HHOOK _hook;
 /***
-	Our config file is binary stored, it contain username/password hotkey config 
+	Our config file is binary stored, it contain username/password hotkey config
 	window state
 ***/
 struct VSTconfig {
@@ -118,8 +118,6 @@ public:
 			return false;
 		}
 	}
-	
-	
 };
 
 class VST : public WithVSTLayout<TopWindow> {
