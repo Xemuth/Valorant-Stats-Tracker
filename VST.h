@@ -7,7 +7,7 @@ using namespace Upp;
 #define LAYOUTFILE <ValorantStatsTracker/VST.lay>
 #include <CtrlCore/lay.h>
 
-
+HHOOK _hook;
 /***
 	Our config file is binary stored, it contain username/password hotkey config 
 	window state
@@ -36,6 +36,19 @@ struct VSTconfig {
 	}
 };
 
+class KeyChange : public WithInputChangeLayout<TopWindow>{
+	dword * CharRegistered = nullptr;
+	bool Key(dword key,int count){
+		Cout() << (long) key << "," << count  << EOL;
+		if(CharRegistered &&  *CharRegistered == 0) *CharRegistered = key;
+		Close();
+		return true;
+	}
+public:
+	typedef KeyChange CLASSNAME;
+	KeyChange(dword& _buffer){CharRegistered = &_buffer; CtrlLayout(*this, t_("Change key"));}
+};
+
 class VSTOption : public WithConfigurationLayout<TopWindow>{
 public:
 	uint8_t key_endRound;
@@ -43,11 +56,8 @@ public:
 	uint8_t headshot_kill;
 	uint8_t game_started;
 	uint8_t game_ended;
-	
 	typedef VSTOption CLASSNAME;
-	VSTOption(){
-		CtrlLayoutOKCancel(*this, t_("Configuration"));
-	};
+	
 	VSTOption(VSTconfig& conf){
 		CtrlLayoutOKCancel(*this, t_("Configuration"));
 		key_endRound = conf.key_endRound;
@@ -93,56 +103,58 @@ public:
 			Exclamation("Error during resolution of HotKey, have you changed your config file by hand ? We advise you to delete it and relaunch the tool.");
 		}
 	}
-};
-
-
-class KeyChange : public WithInputChangeLayout<TopWindow>{
-	dword * CharRegistered = nullptr;
-	bool Key(dword key,int count){
-		Cout() << (long) key << "," << count  << EOL;
-		if(CharRegistered &&  *CharRegistered == 0) *CharRegistered = key;
-		Close();
-		return true;
+	
+	bool HookAKey(uint8_t* ValueToFill, Label& label){
+		dword buff =0;
+		KeyChange key(buff);
+		key.Execute();
+		if(AllKeys.Find(buff) > -1){
+			const WinKey& key = AllKeys.Get(buff);
+			*ValueToFill = (uint8_t)key.KeyCode;
+			label = key.KeyName;
+			return true;
+		}else{
+			label = "ERROR";
+			return false;
+		}
 	}
-public:
-	typedef KeyChange CLASSNAME;
-	KeyChange(dword& _buffer){CharRegistered = &_buffer; CtrlLayout(*this, t_("Change key"));}
+	
+	
 };
 
 class VST : public WithVSTLayout<TopWindow> {
-	enum{END_ROUND = 1, KILL = 2, HEADSHOT_KILL = 3, GAME_STARTED = 4, GAME_ENDED = 5};
-
 	TrayIcon trayicon;
 	VSTconfig cfg;
-	
-	
-	/*
-	 Thread and boolean used to drive listener
-	*/
-	Thread keyboardListener;
-	bool reloadConfig = false; //if set to true, keyboardListener will reload cfg and set it to false
-	bool StopKeyListening = false; //when set to true, thread will stop key listening and will disable key event until it is changed to true
-	bool KeyHaveBeenStop = true;
+/*
+	Thread and boolean used to drive valorant checker
+*/
+	Thread ValorantChecker;
 	bool ValorantIsStarted = false;
-	
+	bool StateChanged = false;
+	bool StopKeyHook = false; // when set to true, it stop hook no matter what happen
+	void RoutineValorantThreadChecker();
 /*
 	config function
 */
 	void LoadCfg();
-	void SetupHotKey();
-	void ClearHotKey();
-	void ProcessEvent(MSG& msg);
-	void RoutineKeyboardListener();
+/*
+	keyboard listener data
+*/
+	static LRESULT __stdcall HookCallback(int nCode, WPARAM wParam, LPARAM lParam);
+	inline static VST* parent; //used to have pointer and process event
+	void SetupHookKey();
+	void ClearHookKey();
+	void ProcessEvent(DWORD key);
+	
 /*
 	Logic function
 */
 	void Configure();
 	void About();
-	void Start();
 	void Exit();
-
 	void dummyFunc(){}
 	void HideWin() { Hide(); }
+	void Paint(Draw& w);
 /*
 	All menu
 */
