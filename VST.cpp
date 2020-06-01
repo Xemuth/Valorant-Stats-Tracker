@@ -83,10 +83,14 @@ void VST::TrayMenu(Bar& bar)
 
 void VST::LoadCfg(){
 	String cfgfile = ConfigFile();
-    if(FileExists(cfgfile) && !LoadFromFile(cfg, cfgfile))
+    if(FileExists(cfgfile) && !LoadFromFile(cfg, cfgfile)){
         Exclamation("Error loading configuration file!");
-    if(!StoreToFile(cfg, cfgfile))
-        Exclamation("Error updating configuration file!");
+		ToolStatus = "Configuration loading failled";
+    }else{
+		ToolStatus = "Default configuration loaded";
+    }
+    /*if(!StoreToFile(cfg, cfgfile))
+        Exclamation("Error updating configuration file!");*/
 }
 
 void VST::SetupHookKey(){
@@ -137,17 +141,22 @@ void VST::Paint(Draw& w){
 		if(!ValorantIsStarted){
 			if(StateChanged){
 				ClearHookKey();
+				ValorantFinder = "Valorant is not found";
+				KeyHookStatus = "KeyHook is disabled";
 				StateChanged = false;
 			}
 		}else{
 			if(StateChanged){
 				SetupHookKey();
+				ValorantFinder = "Valorant is launch";
+				KeyHookStatus = "KeyHook is enabled";
 				StateChanged = false;
 			}
 		}
 	}else{
 		if(!StateChanged){
 			ClearHookKey();
+			KeyHookStatus = "KeyHook is disabled during configuration";
 			StateChanged = true;
 		}
 	}
@@ -178,12 +187,49 @@ void VST::Exit()
 	trayicon.Break();
 }
 
+void VST::PrepareArray(){
+	array.AddColumn("No");
+	array.AddColumn("Date");
+	array.AddColumn("Kill");
+	array.AddColumn("Headshot");
+	array.AddColumn("Total Round");
+	
+	//array.WhenLeftDouble = [=] { DoubleClick(); };
+	array.ColumnWidths("30 90 60 60 70");
+
+	int k =0, hs =0, round =0, games =0;
+	int k_ =0, hs_ =0, round_ =0;
+
+	for(int i = 0; i < 20; i++){
+		k_ = rand() % 30;
+		hs_ = rand() % k_;
+		round_ = 13 +( rand() % 12);
+		games++;
+		k+= k_;
+		hs+= hs_;
+		round+= round_;
+		array.Add(i, GetSysDate() ,k_ , hs_,round_);
+	}
+	
+	TKill = AsString(k);
+	Kill = AsString(k_);
+	THS = AsString(hs);
+	HS = AsString(hs_);
+	TRP = AsString(round);
+	RP = AsString(round_);
+	TGP = AsString(games);
+	
+	
+}
+
 VST::VST()
 {
 	CtrlLayout(*this, t_("Valorant Stats Tracker"));
 	menu.Set(THISBACK(MainMenu));
+	
 	CenterScreen();
 	Icon(VSTImg::icon());
+	
 	hide  <<= THISBACK(HideWin);
 	ChangeValorant.WhenAction = ([&]{
 		ValorantIsStarted = !ValorantIsStarted;
@@ -194,8 +240,12 @@ VST::VST()
 	trayicon.Icon(VSTImg::trayIcon());
 	trayicon.Tip(t_("Valorant Stats Tracker"));
 	parent = this;
+	PrepareArray();
+	
+	DataPersistenceStatus = (BddLoaded)? "Database is loaded":"No database loaded";
 	//First we load the file
 	LoadCfg();
+	
 	//Then we setup hotkey
 	ValorantChecker.Run([&]{ RoutineValorantThreadChecker();});
 }

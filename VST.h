@@ -226,6 +226,11 @@ class VST : public WithVSTLayout<TopWindow> {
 	bool StateChanged = false;
 	bool StopKeyHook = false; // when set to true, it stop hook no matter what happen
 	void RoutineValorantThreadChecker();
+	
+/*
+	Database part 
+*/
+	bool BddLoaded = false;
 /*
 	config function
 */
@@ -253,6 +258,7 @@ class VST : public WithVSTLayout<TopWindow> {
 */
 	void MainMenu(Bar& menu);
 	void TrayMenu(Bar& bar);
+	void PrepareArray();
 
 public:
 	typedef VST CLASSNAME;
