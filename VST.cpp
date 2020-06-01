@@ -30,11 +30,25 @@ void VST::Configure()
 	int exitMode = config.Execute();
 	if(exitMode == 1 ){
 		//Then we save
+		bool ReloadBDD = false;
+		bool CheckAPI =false;
+		
 		cfg.key_kill = config.key_kill;
 		cfg.headshot_kill = config.headshot_kill;
 		cfg.key_endRound = config.key_endRound;
 		cfg.game_started = config.game_started;
 		cfg.game_ended = config.game_ended;
+		
+		if(cfg.DB_Location.Compare(config.DB_Location) !=0) ReloadBDD=true;
+		cfg.DB_Location = config.DB_Location;
+		
+		if(cfg.API_KEY.Compare(config.API_KEY) !=0) CheckAPI=true;
+		cfg.API_KEY = config.API_KEY;
+		
+		cfg.LocalSave = config.LocalSave;
+		cfg.SendDataOnline = config.SendDataOnline;
+		cfg.typeSend = config.typeSend;
+		
 		String cfgfile = ConfigFile();
 		if(!StoreToFile(cfg, cfgfile))
 			Exclamation("Error saving configuration file!");
@@ -45,35 +59,26 @@ void VST::Configure()
 void VST::About()
 {
 	WithAboutDialogLayout<TopWindow> dlg;
-	dlg.text = GetTopic("topic://VST/app/about$en-us").text;
+	dlg.text = GetTopic("topic://ValorantStatsTracker/app/about$en-us").text;
+	dlg.text2 = GetTopic("topic://ValorantStatsTracker/app/about2$en-us").text;
+	dlg.image.SetImage( RescaleFilter(VSTImg::icon(), 70, 70, 0));
+	dlg.image2.SetImage( RescaleFilter(VSTImg::Upp(), 70, 70, 0));
 	CtrlLayoutOK(dlg, "About");
 	dlg.CenterScreen();
 	dlg.Run();
 }
 
-void VST::SettingsMenu(Bar& bar)
-{
-	bar.Add(t_("Configuration"), THISBACK(Configure)).Help(t_("Change settings"));
-	bar.Add(t_("Exit"), THISBACK(Exit)).Help(t_("Exit the application"));
-}
-
-void VST::HelpMenu(Bar& bar)
-{
-	bar.Add(t_("About"), THISBACK(About)) .Help(t_("About VST"));
-}
-
 void VST::MainMenu(Bar& bar)
 {
-	bar.Add(t_("Settings"), THISBACK(SettingsMenu));
-	bar.Add(t_("Help"), THISBACK(HelpMenu));
+	bar.Add(t_("Configuration"), THISBACK(Configure)).Help(t_("Change settings"));
+	bar.Add(t_("About"), THISBACK(About)) .Help(t_("About VST"));
+	bar.Add(t_("Exit"), THISBACK(Exit)).Help(t_("Exit the application"));
 }
-
 void VST::TrayMenu(Bar& bar)
 {
-	bar.Add(t_("Show VST"), THISBACK(dummyFunc));
-	bar.Add(t_("Ignore eyes"), THISBACK(dummyFunc)).Check(true);
-	bar.Add(t_("About.."), THISBACK(About));
-	bar.Add(t_("Exit"), THISBACK(Exit));
+	bar.Add(t_("Configuration"), THISBACK(Configure)).Help(t_("Change settings"));
+	bar.Add(t_("About"), THISBACK(About)) .Help(t_("About VST"));
+	bar.Add(t_("Exit"), THISBACK(Exit)).Help(t_("Exit the application"));
 }
 
 void VST::LoadCfg(){
@@ -154,10 +159,10 @@ void VST::RoutineValorantThreadChecker(){
 	for(;;){
 		if(Thread::IsShutdownThreads())break;
 		lastValue = ValorantIsStarted;
-		if(::FindWindow(NULL, "valorant")) {
-		//	ValorantIsStarted =true;
+		if(CheckForProcess(targetProcessName)) {
+			ValorantIsStarted =true;
 		}else{
-		//	ValorantIsStarted = false;
+			ValorantIsStarted = false;
 		}
 		if(lastValue != ValorantIsStarted)StateChanged = true;
 		Sleep(100);
@@ -184,14 +189,11 @@ VST::VST()
 		ValorantIsStarted = !ValorantIsStarted;
 		StateChanged = true;
 	});
-
 	trayicon.WhenBar = THISBACK(TrayMenu);
 	trayicon.WhenLeftDouble = THISBACK(dummyFunc);
 	trayicon.Icon(VSTImg::trayIcon());
 	trayicon.Tip(t_("Valorant Stats Tracker"));
-	
 	parent = this;
-	
 	//First we load the file
 	LoadCfg();
 	//Then we setup hotkey
