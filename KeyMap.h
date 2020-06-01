@@ -4,7 +4,6 @@
 struct WinKey{
 	Upp::String KeyName ="";
 	int KeyCode;
-	
 	WinKey(const Upp::String& KN, int code){
 		KeyName = KN;
 		KeyCode = code;

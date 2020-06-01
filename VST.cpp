@@ -11,6 +11,7 @@ BOOL GetMessageWithTimeout(MSG *msg, UINT to);
 
 void VST::Configure()
 {
+	VSTOption config(cfg);
 	config.RoundEndedChange.WhenAction = ([&]{
 		StopKeyListening =true; //Setting this to true ensure the key listening wont occure with KeyChange action
 		dword test =0;
@@ -178,7 +179,6 @@ void VST::Exit()
 
 VST::VST()
 {
-	CtrlLayoutOKCancel(config, t_("Configuration"));
 	CtrlLayout(*this, t_("Valorant Stats Tracker"));
 	menu.Set(THISBACK(MainMenu));
 	CenterScreen();
